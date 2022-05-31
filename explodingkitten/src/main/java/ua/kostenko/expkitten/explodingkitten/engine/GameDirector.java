@@ -34,7 +34,7 @@ public class GameDirector {
 
         this.gameEdition = gameEdition;
         this.gameState = new GameState(UUID.randomUUID().toString(),
-                new LinkedList<>(),
+                new PlayersList(),
                 new LinkedList<>(),
                 new LinkedList<>(),
                 GameDirection.FORWARD);
@@ -55,9 +55,9 @@ public class GameDirector {
     public void registerPlayer(String gameId, String playerName) {
         if (this.gameState.getGameSessionId().equals(gameId)
                 && !playerName.isBlank()
-                && this.gameState.getPlayersList().stream()
+                && this.gameState.getPlayersList().getPlayers().stream()
                 .noneMatch(user -> user.getPlayerName().equals(playerName))) {
-            this.gameState.getPlayersList().add(Player.builder()
+            this.gameState.getPlayersList().addPlayer(Player.builder()
                     .isAlive(true)
                     .isActive(false)
                     .playerName(playerName)
@@ -68,10 +68,11 @@ public class GameDirector {
 
     public void beginGame(String gameId) {
         if (this.gameState.getGameSessionId().equals(gameId)
-                && this.gameState.getPlayersList().size() == initialNumberOfPlayers) {
+                && this.gameState.getPlayersList().getPlayers().size() == initialNumberOfPlayers) {
             initGameDeck();
+        } else {
+            throw new RuntimeException("Incorrect state for game beginning");
         }
-        throw new RuntimeException("Incorrect state for game beginning");
     }
 
     private void initGameDeck() {
@@ -90,7 +91,7 @@ public class GameDirector {
         Collections.shuffle(temporalGeneralDeck);
 
         this.gameState.getCardDeck().addAll(temporalGeneralDeck);
-        this.gameState.getPlayersList().getFirst().setActive(true);
+        this.gameState.getPlayersList().getPlayers().stream().findFirst().get().setActive(true);
     }
 
     private void handOutCardsToPlayersWithoutDefuse(LinkedList<Card> deck) {
@@ -102,9 +103,7 @@ public class GameDirector {
     }
 
     private void handOutDefuseCardsToPlayers(LinkedList<Card> deck) {
-        this.gameState.getPlayersList().forEach(player -> {
-            player.getPlayerCards().add(deck.pollFirst());
-        });
+        this.gameState.getPlayersList().forEach(player -> player.getPlayerCards().add(deck.pollFirst()));
     }
 
     private LinkedList<Card> createInitialDeckWithoutCatsAndDefuse(Predicate<Map.Entry<CardAction, Integer>> filterPredicate) {
@@ -132,7 +131,7 @@ public class GameDirector {
         var gameStateGameId = gameState.getGameSessionId();
         var cardDeck = gameState.getCardDeck();
         var players = gameState.getPlayersList();
-        var activePlayer = players.stream().filter(p -> username.equals(p.getPlayerName())).findFirst();
+        var activePlayer = players.getPlayers().stream().filter(p -> username.equals(p.getPlayerName())).findFirst();
 
         if (!gameStateGameId.equals(gameId) || activePlayer.isEmpty()) {
             log.debug("Error with input. GameId = {}, username = {}", gameId, username);
