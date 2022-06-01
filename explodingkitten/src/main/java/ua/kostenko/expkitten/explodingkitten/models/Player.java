@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 @Data
 public class Player {
-    private final String gameId;
+    private final String gameSessionId;
     private final String playerName;
     private final List<Card> playerCards;
     private boolean isAlive;

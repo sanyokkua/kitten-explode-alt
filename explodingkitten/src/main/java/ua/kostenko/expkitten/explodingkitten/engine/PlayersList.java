@@ -25,7 +25,7 @@ public class PlayersList implements Iterable<Player> {
     }
 
     public Player getNext(Player currentPlayer) {
-        Optional<Map.Entry<Integer, Player>> currentPlayerEntry = players.entrySet().stream().filter(integerPlayerEntry -> integerPlayerEntry.getValue().getPlayerName().equals(currentPlayer.getPlayerName())).findAny();
+        Optional<Map.Entry<Integer, Player>> currentPlayerEntry = getCurrentPlayerEntry(currentPlayer);
         if (currentPlayerEntry.isEmpty()) {
             throw new RuntimeException();
         }
@@ -37,8 +37,12 @@ public class PlayersList implements Iterable<Player> {
         }
     }
 
+    private Optional<Map.Entry<Integer, Player>> getCurrentPlayerEntry(Player currentPlayer) {
+        return players.entrySet().stream().filter(integerPlayerEntry -> integerPlayerEntry.getValue().getPlayerName().equals(currentPlayer.getPlayerName())).findAny();
+    }
+
     public Player getPrevious(Player currentPlayer) {
-        Optional<Map.Entry<Integer, Player>> currentPlayerEntry = players.entrySet().stream().filter(integerPlayerEntry -> integerPlayerEntry.getValue().getPlayerName().equals(currentPlayer.getPlayerName())).findAny();
+        Optional<Map.Entry<Integer, Player>> currentPlayerEntry = getCurrentPlayerEntry(currentPlayer);
         if (currentPlayerEntry.isEmpty()) {
             throw new RuntimeException();
         }
