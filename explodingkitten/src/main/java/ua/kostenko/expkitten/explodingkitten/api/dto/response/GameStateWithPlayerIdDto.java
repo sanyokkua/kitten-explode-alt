@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.api.dto;
+package ua.kostenko.expkitten.explodingkitten.api.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,10 +9,11 @@ import java.util.List;
 
 @Data
 @Builder
-public class GameStateDto {
+public class GameStateWithPlayerIdDto {
     private final String gameSessionId;
-    private final List<PlayerInfoDto> players;
+    private final String playerId;
     private final int amountOfCardsInDeck;
-    private final List<Card> discardPile;
     private final GameDirection gameDirection;
+    private final List<CommonPlayerInfoDto> players;
+    private final List<Card> discardPile;
 }

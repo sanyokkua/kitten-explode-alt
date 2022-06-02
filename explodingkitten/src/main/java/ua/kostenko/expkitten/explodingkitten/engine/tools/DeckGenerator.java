@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
 import ua.kostenko.expkitten.explodingkitten.models.card.Card;
 import ua.kostenko.expkitten.explodingkitten.models.card.CardAction;
@@ -93,7 +93,6 @@ public class DeckGenerator {
                     }
 
                 });
-
         return temporalGeneralStack;
     }
 }

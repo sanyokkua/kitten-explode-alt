@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import ua.kostenko.expkitten.explodingkitten.models.deck.GameEdition;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ua.kostenko.expkitten.explodingkitten.engine.GameFilterPredicates.*;
+import static ua.kostenko.expkitten.explodingkitten.engine.tools.GameFilterPredicates.*;
 
 public class GameFilterPredicatesTest {
     private Map<CardAction, Integer> originalEdition;

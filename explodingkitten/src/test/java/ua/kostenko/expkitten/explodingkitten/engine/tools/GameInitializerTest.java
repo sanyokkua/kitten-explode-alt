@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,51 +20,41 @@ public class GameInitializerTest {
 
     @Test
     public void testValidation() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            GameInitializer.initGameDeck(null,
-                    new GameState("sessionId",
-                            new PlayersList(),
-                            new LinkedList<>(),
-                            new LinkedList<>(),
-                            new LinkedList<>(),
-                            GameDirection.FORWARD),
-                    "player1");
-        });
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION,
-                    null,
-                    "player1");
-        });
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION,
-                    new GameState("sessionId",
-                            new PlayersList(),
-                            new LinkedList<>(),
-                            new LinkedList<>(),
-                            new LinkedList<>(),
-                            GameDirection.FORWARD),
-                    null);
-        });
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION,
-                    new GameState("sessionId",
-                            new PlayersList(),
-                            new LinkedList<>(),
-                            new LinkedList<>(),
-                            new LinkedList<>(),
-                            GameDirection.FORWARD),
-                    "  ");
-        });
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION,
-                    new GameState("sessionId",
-                            new PlayersList(),
-                            new LinkedList<>(),
-                            new LinkedList<>(),
-                            new LinkedList<>(),
-                            GameDirection.FORWARD),
-                    "player2");
-        });
+        Assertions.assertThrows(NullPointerException.class, () -> GameInitializer.initGameDeck(null,
+                new GameState("sessionId",
+                        new PlayersList(),
+                        new LinkedList<>(),
+                        new LinkedList<>(),
+                        new LinkedList<>(),
+                        GameDirection.FORWARD),
+                "player1"));
+        Assertions.assertThrows(NullPointerException.class, () -> GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION,
+                null,
+                "player1"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION,
+                new GameState("sessionId",
+                        new PlayersList(),
+                        new LinkedList<>(),
+                        new LinkedList<>(),
+                        new LinkedList<>(),
+                        GameDirection.FORWARD),
+                null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION,
+                new GameState("sessionId",
+                        new PlayersList(),
+                        new LinkedList<>(),
+                        new LinkedList<>(),
+                        new LinkedList<>(),
+                        GameDirection.FORWARD),
+                "  "));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION,
+                new GameState("sessionId",
+                        new PlayersList(),
+                        new LinkedList<>(),
+                        new LinkedList<>(),
+                        new LinkedList<>(),
+                        GameDirection.FORWARD),
+                "player2"));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             GameState gameState = new GameState("gameSessionId",

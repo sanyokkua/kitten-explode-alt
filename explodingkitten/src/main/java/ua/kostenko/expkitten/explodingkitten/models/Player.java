@@ -14,6 +14,10 @@ public class Player {
      */
     private final String gameSessionId;
     /**
+     * Player Unique ID generated after registration in session
+     */
+    private final String playerId;
+    /**
      * Unique Player Name in the current game session
      */
     private final String playerName;

@@ -1,6 +1,7 @@
-package ua.kostenko.expkitten.explodingkitten.api;
+package ua.kostenko.expkitten.explodingkitten.engine.repositories;
 
 import org.springframework.stereotype.Repository;
+import ua.kostenko.expkitten.explodingkitten.api.GameStatePersistence;
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
 
 import java.util.HashMap;

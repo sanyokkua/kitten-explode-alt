@@ -4,11 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.kostenko.expkitten.explodingkitten.api.GameControllerApi;
 import ua.kostenko.expkitten.explodingkitten.api.GameStatePersistence;
-import ua.kostenko.expkitten.explodingkitten.api.dto.*;
-import ua.kostenko.expkitten.explodingkitten.engine.GameInitializer;
-import ua.kostenko.expkitten.explodingkitten.engine.PlayersList;
+import ua.kostenko.expkitten.explodingkitten.api.MoveType;
+import ua.kostenko.expkitten.explodingkitten.api.dto.request.AddPlayerToSessionDto;
+import ua.kostenko.expkitten.explodingkitten.api.dto.request.BeginGameDto;
+import ua.kostenko.expkitten.explodingkitten.api.dto.request.GetInfoForPlayer;
+import ua.kostenko.expkitten.explodingkitten.api.dto.request.MakeMoveDto;
+import ua.kostenko.expkitten.explodingkitten.api.dto.response.CommonPlayerInfoDto;
+import ua.kostenko.expkitten.explodingkitten.api.dto.response.GameStateDto;
+import ua.kostenko.expkitten.explodingkitten.api.dto.response.GameStateWithPlayerIdDto;
+import ua.kostenko.expkitten.explodingkitten.api.dto.response.PlayerFullInfoDto;
 import ua.kostenko.expkitten.explodingkitten.engine.processors.ProcessCardModel;
 import ua.kostenko.expkitten.explodingkitten.engine.processors.Processor;
+import ua.kostenko.expkitten.explodingkitten.engine.tools.GameInitializer;
+import ua.kostenko.expkitten.explodingkitten.engine.tools.PlayersList;
 import ua.kostenko.expkitten.explodingkitten.models.GameDirection;
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
 import ua.kostenko.expkitten.explodingkitten.models.Player;
@@ -38,29 +46,31 @@ public class GameController implements GameControllerApi {
 
     @PostMapping("/addUserToSession")
     @Override
-    public GameStateDto addPlayerToSession(@RequestBody AddPlayerToSessionDto addPlayerToSessionDto) {
+    public GameStateWithPlayerIdDto addPlayerToSession(@RequestBody AddPlayerToSessionDto addPlayerToSessionDto) {
         validateGameSessionId(addPlayerToSessionDto.getGameSessionId());
-        validatePlayerName(addPlayerToSessionDto.getPlayerName());
+        validatePlayerNameOrId(addPlayerToSessionDto.getPlayerName());
 
         GameState gameState = gameStatePersistence.loadGameState(addPlayerToSessionDto.getGameSessionId());
         validateGameState(gameState);
 
+        String playerId = UUID.randomUUID().toString();
         gameState.getPlayersList().addPlayer(Player.builder()
                 .isActive(false)
                 .isAlive(true)
                 .playerName(addPlayerToSessionDto.getPlayerName())
                 .playerCards(new ArrayList<>())
                 .gameSessionId(gameState.getGameSessionId())
+                .playerId(playerId)
                 .build());
         gameStatePersistence.saveGameState(gameState);
-        return buildGameStateDto(gameState);
+        return buildGameStateWithPlayerIdDto(gameState, playerId);
     }
 
     @PostMapping("/beginGame")
     @Override
     public GameStateDto beginGame(@RequestBody BeginGameDto beginGameDto) {
         validateGameSessionId(beginGameDto.getGameSessionId());
-        validatePlayerName(beginGameDto.getPlayerName());
+        validatePlayerNameOrId(beginGameDto.getPlayerName());
 
         GameState gameState = gameStatePersistence.loadGameState(beginGameDto.getGameSessionId());
         validateGameState(gameState);
@@ -87,17 +97,34 @@ public class GameController implements GameControllerApi {
     @Override
     public GameStateDto makeMove(@RequestBody MakeMoveDto makeMoveDto) {
         validateGameSessionId(makeMoveDto.getGameSessionId());
-        validatePlayerName(makeMoveDto.getPlayerName());
+        validatePlayerNameOrId(makeMoveDto.getPlayerId());
         GameState gameState = gameStatePersistence.loadGameState(makeMoveDto.getGameSessionId());
         moveProcessor.process(ProcessCardModel.builder()
                 .gameState(gameState)
-                .activePlayer(gameState.getPlayersList().getPlayerByName(makeMoveDto.getPlayerName()))
+                .activePlayer(gameState.getPlayersList().getPlayerById(makeMoveDto.getPlayerId()))
                 .currentCard(makeMoveDto.getCard())
-                .targetPlayerNam(makeMoveDto.getTargetPlayerName())
+                .targetPlayerName(makeMoveDto.getTargetPlayerName())
                 .moveType(makeMoveDto.getType())
                 .build());
         gameStatePersistence.saveGameState(gameState);
         return buildGameStateDto(gameState);
+    }
+
+    @PostMapping("/getInfoForPlayer")
+    @Override
+    public PlayerFullInfoDto getInfoForPlayer(@RequestBody GetInfoForPlayer getInfoForPlayer) {
+        validateGameSessionId(getInfoForPlayer.getGameSessionId());
+        validatePlayerNameOrId(getInfoForPlayer.getPlayerId());
+        GameState gameState = gameStatePersistence.loadGameState(getInfoForPlayer.getGameSessionId());
+        Player playerById = gameState.getPlayersList().getPlayerById(getInfoForPlayer.getPlayerId());
+        return PlayerFullInfoDto.builder()
+                .playerName(playerById.getPlayerName())
+                .isActive(playerById.isActive())
+                .isAlive(playerById.isAlive())
+                .playerCards(playerById.getPlayerCards())
+                .amountOfCards(playerById.getPlayerCards().size())
+                .possibleMoves(List.of(MoveType.TAKE_CARD))
+                .build();
     }
 
     @GetMapping("/getGameEditions")
@@ -112,7 +139,7 @@ public class GameController implements GameControllerApi {
                 .gameDirection(gameState.getGameDirection())
                 .amountOfCardsInDeck(gameState.getCardDeck().size())
                 .discardPile(gameState.getDiscardPile())
-                .players(gameState.getPlayersList().getPlayers().stream().map(player -> PlayerInfoDto.builder()
+                .players(gameState.getPlayersList().getPlayers().stream().map(player -> CommonPlayerInfoDto.builder()
                         .amountOfCards(player.getPlayerCards().size())
                         .isActive(player.isActive())
                         .isAlive(player.isAlive())
@@ -121,7 +148,23 @@ public class GameController implements GameControllerApi {
                 .build();
     }
 
-    private void validatePlayerName(String playerName) {
+    private GameStateWithPlayerIdDto buildGameStateWithPlayerIdDto(GameState gameState, String playerId) {
+        return GameStateWithPlayerIdDto.builder()
+                .gameSessionId(gameState.getGameSessionId())
+                .gameDirection(gameState.getGameDirection())
+                .amountOfCardsInDeck(gameState.getCardDeck().size())
+                .discardPile(gameState.getDiscardPile())
+                .players(gameState.getPlayersList().getPlayers().stream().map(player -> CommonPlayerInfoDto.builder()
+                        .amountOfCards(player.getPlayerCards().size())
+                        .isActive(player.isActive())
+                        .isAlive(player.isAlive())
+                        .playerName(player.getPlayerName())
+                        .build()).collect(Collectors.toList()))
+                .playerId(playerId)
+                .build();
+    }
+
+    private void validatePlayerNameOrId(String playerName) {
         if (Objects.isNull(playerName) || playerName.isBlank()) {
             throw new IllegalArgumentException("Player Name can't be blank");
         }

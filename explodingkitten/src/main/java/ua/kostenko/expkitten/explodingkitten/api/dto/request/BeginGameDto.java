@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.api.dto;
+package ua.kostenko.expkitten.explodingkitten.api.dto.request;
 
 import lombok.Builder;
 import lombok.Data;

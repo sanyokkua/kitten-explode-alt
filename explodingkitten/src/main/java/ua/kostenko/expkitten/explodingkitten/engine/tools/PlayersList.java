@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
 import ua.kostenko.expkitten.explodingkitten.models.Player;
 
@@ -34,6 +34,16 @@ public class PlayersList implements Iterable<Player> {
         return playerOptional.get();
     }
 
+    public Player getPlayerById(String playerId) {
+        Optional<Player> playerOptional = players.values().stream()
+                .filter(player -> playerId.equals(player.getPlayerId()))
+                .findAny();
+        if (playerOptional.isEmpty()) {
+            throw new IllegalArgumentException("Player doesn't exist");
+        }
+        return playerOptional.get();
+    }
+
     public Player getNext(Player currentPlayer) {
         Optional<Map.Entry<Integer, Player>> currentPlayerEntry = getCurrentPlayerEntry(currentPlayer);
         if (currentPlayerEntry.isEmpty()) {
@@ -47,10 +57,6 @@ public class PlayersList implements Iterable<Player> {
         }
     }
 
-    private Optional<Map.Entry<Integer, Player>> getCurrentPlayerEntry(Player currentPlayer) {
-        return players.entrySet().stream().filter(integerPlayerEntry -> integerPlayerEntry.getValue().getPlayerName().equals(currentPlayer.getPlayerName())).findAny();
-    }
-
     public Player getPrevious(Player currentPlayer) {
         Optional<Map.Entry<Integer, Player>> currentPlayerEntry = getCurrentPlayerEntry(currentPlayer);
         if (currentPlayerEntry.isEmpty()) {
@@ -62,6 +68,10 @@ public class PlayersList implements Iterable<Player> {
         } else {
             return players.get(lastIndex);
         }
+    }
+
+    private Optional<Map.Entry<Integer, Player>> getCurrentPlayerEntry(Player currentPlayer) {
+        return players.entrySet().stream().filter(integerPlayerEntry -> integerPlayerEntry.getValue().getPlayerName().equals(currentPlayer.getPlayerName())).findAny();
     }
 
     @Override

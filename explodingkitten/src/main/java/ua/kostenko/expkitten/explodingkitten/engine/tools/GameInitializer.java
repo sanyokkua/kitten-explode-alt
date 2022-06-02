@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
 import ua.kostenko.expkitten.explodingkitten.models.Player;
@@ -9,7 +9,7 @@ import ua.kostenko.expkitten.explodingkitten.models.deck.GameEdition;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ua.kostenko.expkitten.explodingkitten.engine.GameFilterPredicates.*;
+import static ua.kostenko.expkitten.explodingkitten.engine.tools.GameFilterPredicates.*;
 
 public class GameInitializer {
 

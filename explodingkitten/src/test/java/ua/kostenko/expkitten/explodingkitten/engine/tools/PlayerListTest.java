@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -103,6 +103,7 @@ public class PlayerListTest {
         assertEquals(player2, actualPl2);
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     public void testForEach() {
         PlayersList list = new PlayersList();
@@ -151,18 +152,62 @@ public class PlayerListTest {
     }
 
     @Test
+    public void testGetPlayerById() {
+        PlayersList list = new PlayersList();
+        Player player1 = Player.builder().playerName("player1").playerId("id1").build();
+        Player player2 = Player.builder().playerName("player2").playerId("id2").build();
+        Player player3 = Player.builder().playerName("player3").playerId("id3").build();
+
+        list.addPlayer(player1);
+        list.addPlayer(player2);
+        list.addPlayer(player3);
+
+        Player actualPl1 = list.getPlayerById("id1");
+        Player actualPl2 = list.getPlayerById("id2");
+        Player actualPl3 = list.getPlayerById("id3");
+
+        assertEquals(player1, actualPl1);
+        assertEquals(player2, actualPl2);
+        assertEquals(player3, actualPl3);
+    }
+
+    @Test
+    public void testFailureOnGettingPlayerByName() {
+        PlayersList list = new PlayersList();
+        Player player1 = Player.builder().playerName("player1").playerId("id1").build();
+        Player player2 = Player.builder().playerName("player2").playerId("id2").build();
+        Player player3 = Player.builder().playerName("player3").playerId("id3").build();
+
+        list.addPlayer(player1);
+        list.addPlayer(player2);
+        list.addPlayer(player3);
+
+        Assertions.assertThrows(RuntimeException.class, () -> list.getPlayerByName("NonExisting"));
+    }
+
+    @Test
+    public void testFailureOnGettingPlayerById() {
+        PlayersList list = new PlayersList();
+        Player player1 = Player.builder().playerName("player1").playerId("id1").build();
+        Player player2 = Player.builder().playerName("player2").playerId("id2").build();
+        Player player3 = Player.builder().playerName("player3").playerId("id3").build();
+
+        list.addPlayer(player1);
+        list.addPlayer(player2);
+        list.addPlayer(player3);
+
+        Assertions.assertThrows(RuntimeException.class, () -> list.getPlayerById("NonExisting"));
+    }
+
+    @Test
     public void testNextValidation() {
         PlayersList list = new PlayersList();
-        Assertions.assertThrows(RuntimeException.class, () -> {
-            list.getNext(Player.builder().playerName("noExisting").build());
-        });
+        Assertions.assertThrows(RuntimeException.class, () -> list.getNext(Player.builder().playerName("noExisting").build()));
     }
 
     @Test
     public void testPreviousValidation() {
         PlayersList list = new PlayersList();
-        Assertions.assertThrows(RuntimeException.class, () -> {
-            list.getPrevious(Player.builder().playerName("noExisting").build());
-        });
+        Assertions.assertThrows(RuntimeException.class, () -> list.getPrevious(Player.builder().playerName("noExisting").build()));
     }
 }

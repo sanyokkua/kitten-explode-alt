@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
 import ua.kostenko.expkitten.explodingkitten.models.card.Card;
@@ -25,7 +25,7 @@ public class GameTools {
 
     public static void putCatCardIntoDeck(GameState gameState, Card card, int position) {
         int size = gameState.getCardDeck().size();
-        if (position < 0 || position > size) {
+        if (position < 0 || position >= size) {
             throw new IllegalArgumentException("Position should be between 0 and deck size");
         }
         if (position == 0) {
@@ -35,6 +35,5 @@ public class GameTools {
         } else {
             gameState.getCardDeck().add(position, card);
         }
-
     }
 }

@@ -1,5 +1,6 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ua.kostenko.expkitten.explodingkitten.models.GameDirection;
@@ -16,11 +17,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ua.kostenko.expkitten.explodingkitten.engine.GameFilterPredicates.IS_DEFUSE_PREDICATE;
-import static ua.kostenko.expkitten.explodingkitten.engine.GameFilterPredicates.IS_NOT_CAT_AND_NOT_DEFUSE;
+import static ua.kostenko.expkitten.explodingkitten.engine.tools.GameFilterPredicates.IS_DEFUSE_PREDICATE;
+import static ua.kostenko.expkitten.explodingkitten.engine.tools.GameFilterPredicates.IS_NOT_CAT_AND_NOT_DEFUSE;
 
 public class GameToolsTest {
-    private final String gameSessionId = "session-id-1";
     private final String playerName1 = "Player-1";
     private final String playerName2 = "Player-2";
     private final String playerName3 = "Player-3";
@@ -31,6 +31,7 @@ public class GameToolsTest {
     @BeforeEach
     public void beforeEach() {
         originalEdition = DeckGenerator.getDeckInformationForEdition(GameEdition.ORIGINAL_EDITION);
+        String gameSessionId = "session-id-1";
         gameState = new GameState(gameSessionId,
                 new PlayersList(),
                 new LinkedList<>(),
@@ -121,7 +122,7 @@ public class GameToolsTest {
     public void putCatCardIntoDeckTest() {
         GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION, gameState, playerName1);
         LinkedList<Card> cardDeck = gameState.getCardDeck();
-        LinkedList<Card> cats = new LinkedList<>(cardDeck.stream().filter(c -> CardAction.CATS.equals(c.getCardAction())).collect(Collectors.toList()));
+        LinkedList<Card> cats = cardDeck.stream().filter(c -> CardAction.CATS.equals(c.getCardAction())).collect(Collectors.toCollection(LinkedList::new));
         cats.forEach(cardDeck::remove);
 
         assertEquals(3, cats.size());
@@ -142,5 +143,26 @@ public class GameToolsTest {
 
         GameTools.putCatCardIntoDeck(gameState, cat3, 13);
         assertEquals(cat3, gameState.getCardDeck().get(13));
+    }
+
+    @Test
+    public void testPutCatCardIntoDeckFailure() {
+        GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION, gameState, playerName1);
+        LinkedList<Card> cardDeck = gameState.getCardDeck();
+        LinkedList<Card> cats = cardDeck.stream().filter(c -> CardAction.CATS.equals(c.getCardAction())).collect(Collectors.toCollection(LinkedList::new));
+        cats.forEach(cardDeck::remove);
+
+        assertEquals(3, cats.size());
+
+        var cat1 = cats.pollFirst();
+        var cat2 = cats.pollFirst();
+        var cat3 = cats.pollFirst();
+
+        assertNotNull(cat1);
+        assertNotNull(cat2);
+        assertNotNull(cat3);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> GameTools.putCatCardIntoDeck(gameState, cat1, -1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> GameTools.putCatCardIntoDeck(gameState, cat1, gameState.getCardDeck().size()));
     }
 }

@@ -15,6 +15,6 @@ public class ProcessCardModel {
     private final Player activePlayer;
     private final Card currentCard;
     private final GameState gameState;
-    private final String targetPlayerNam;
+    private final String targetPlayerName;
     private final MoveType moveType;
 }

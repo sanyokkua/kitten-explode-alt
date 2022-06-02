@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.engine;
+package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
 import org.junit.jupiter.api.Test;
 import ua.kostenko.expkitten.explodingkitten.models.card.Card;
@@ -9,12 +9,12 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ua.kostenko.expkitten.explodingkitten.engine.GameFilterPredicates.*;
+import static ua.kostenko.expkitten.explodingkitten.engine.tools.GameFilterPredicates.*;
 
 public class DeckGeneratorTest {
 
     @Test
-    public void testGetDeckInformationForEdition() throws Exception {
+    public void testGetDeckInformationForEdition() {
         Map<CardAction, Integer> originalEdition = DeckGenerator.getDeckInformationForEdition(GameEdition.ORIGINAL_EDITION);
         int originalEditionCount = originalEdition.values().stream().mapToInt(val -> val).sum();
 
@@ -34,7 +34,7 @@ public class DeckGeneratorTest {
     }
 
     @Test
-    public void testGetDeckByPredicate() throws Exception {
+    public void testGetDeckByPredicate() {
         Map<CardAction, Integer> originalEdition = DeckGenerator.getDeckInformationForEdition(GameEdition.ORIGINAL_EDITION);
         LinkedList<Card> originalEditionDeck = new LinkedList<>(DeckGenerator.getDeckByPredicate(originalEdition, IS_NOT_CAT_AND_NOT_DEFUSE));
         LinkedList<Card> originalEditionDefuseDeck = new LinkedList<>(DeckGenerator.getDeckByPredicate(originalEdition, IS_DEFUSE_PREDICATE));

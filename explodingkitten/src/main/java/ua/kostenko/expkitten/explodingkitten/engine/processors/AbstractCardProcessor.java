@@ -1,6 +1,6 @@
 package ua.kostenko.expkitten.explodingkitten.engine.processors;
 
-import ua.kostenko.expkitten.explodingkitten.engine.PlayersList;
+import ua.kostenko.expkitten.explodingkitten.engine.tools.PlayersList;
 import ua.kostenko.expkitten.explodingkitten.models.GameDirection;
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
 import ua.kostenko.expkitten.explodingkitten.models.Player;
@@ -25,6 +25,7 @@ public abstract class AbstractCardProcessor implements Processor {
                 } else {
                     activateNextPlayer(nextPlayer, state);
                 }
+                break;
             }
             case BACKWARD: {
                 active.setActive(false);
@@ -34,7 +35,10 @@ public abstract class AbstractCardProcessor implements Processor {
                 } else {
                     activateNextPlayer(nextPlayer, state);
                 }
+                break;
             }
+            default:
+                throw new IllegalArgumentException();
         }
     }
 }
