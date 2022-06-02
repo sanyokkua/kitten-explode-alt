@@ -1,21 +1,24 @@
 package ua.kostenko.expkitten.explodingkitten.api;
 
+import ua.kostenko.expkitten.explodingkitten.api.dto.AddPlayerToSessionDto;
+import ua.kostenko.expkitten.explodingkitten.api.dto.BeginGameDto;
 import ua.kostenko.expkitten.explodingkitten.api.dto.GameStateDto;
-import ua.kostenko.expkitten.explodingkitten.models.card.Card;
+import ua.kostenko.expkitten.explodingkitten.api.dto.MakeMoveDto;
 import ua.kostenko.expkitten.explodingkitten.models.deck.GameEdition;
 
 import java.util.List;
 
 public interface GameControllerApi {
-    GameStateDto startGameSession(int numberOfPlayers, GameEdition gameEdition);
 
-    GameStateDto addUserToSession(String gameSessionId, String username);
+    GameStateDto startGameSession();
 
-    GameStateDto beginGame(String gameSessionId, String playerName, GameEdition gameEdition);
+    GameStateDto addPlayerToSession(AddPlayerToSessionDto addPlayerToSessionDto);
+
+    GameStateDto beginGame(BeginGameDto beginGameDto);
 
     GameStateDto getUpdatedInfo(String gameSessionId);
 
-    GameStateDto makeMove(String gameSessionId, String playerName, MoveType type, Card card, String targetPlayerName);
+    GameStateDto makeMove(MakeMoveDto makeMoveDto);
 
     List<GameEdition> getGameEditions();
 

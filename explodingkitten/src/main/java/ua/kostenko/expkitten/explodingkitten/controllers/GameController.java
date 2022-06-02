@@ -1,12 +1,10 @@
 package ua.kostenko.expkitten.explodingkitten.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ua.kostenko.expkitten.explodingkitten.api.GameControllerApi;
 import ua.kostenko.expkitten.explodingkitten.api.GameStatePersistence;
-import ua.kostenko.expkitten.explodingkitten.api.MoveType;
-import ua.kostenko.expkitten.explodingkitten.api.dto.GameStateDto;
-import ua.kostenko.expkitten.explodingkitten.api.dto.PlayerInfoDto;
+import ua.kostenko.expkitten.explodingkitten.api.dto.*;
 import ua.kostenko.expkitten.explodingkitten.engine.GameInitializer;
 import ua.kostenko.expkitten.explodingkitten.engine.PlayersList;
 import ua.kostenko.expkitten.explodingkitten.engine.processors.ProcessCardModel;
@@ -14,7 +12,6 @@ import ua.kostenko.expkitten.explodingkitten.engine.processors.Processor;
 import ua.kostenko.expkitten.explodingkitten.models.GameDirection;
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
 import ua.kostenko.expkitten.explodingkitten.models.Player;
-import ua.kostenko.expkitten.explodingkitten.models.card.Card;
 import ua.kostenko.expkitten.explodingkitten.models.deck.GameEdition;
 
 import java.util.*;
@@ -26,8 +23,9 @@ public class GameController implements GameControllerApi {
     private final GameStatePersistence gameStatePersistence;
     private final Processor moveProcessor;
 
+    @PostMapping("/startGameSession")
     @Override
-    public GameStateDto startGameSession(int numberOfPlayers, GameEdition gameEdition) {
+    public GameStateDto startGameSession() {
         GameState gameState = new GameState(UUID.randomUUID().toString(),
                 new PlayersList(),
                 new LinkedList<>(),
@@ -38,18 +36,19 @@ public class GameController implements GameControllerApi {
         return buildGameStateDto(gameState);
     }
 
+    @PostMapping("/addUserToSession")
     @Override
-    public GameStateDto addUserToSession(String gameSessionId, String playerName) {
-        validateGameSessionId(gameSessionId);
-        validatePlayerName(playerName);
+    public GameStateDto addPlayerToSession(@RequestBody AddPlayerToSessionDto addPlayerToSessionDto) {
+        validateGameSessionId(addPlayerToSessionDto.getGameSessionId());
+        validatePlayerName(addPlayerToSessionDto.getPlayerName());
 
-        GameState gameState = gameStatePersistence.loadGameState(gameSessionId);
+        GameState gameState = gameStatePersistence.loadGameState(addPlayerToSessionDto.getGameSessionId());
         validateGameState(gameState);
 
         gameState.getPlayersList().addPlayer(Player.builder()
                 .isActive(false)
                 .isAlive(true)
-                .playerName(playerName)
+                .playerName(addPlayerToSessionDto.getPlayerName())
                 .playerCards(new ArrayList<>())
                 .gameSessionId(gameState.getGameSessionId())
                 .build());
@@ -57,16 +56,17 @@ public class GameController implements GameControllerApi {
         return buildGameStateDto(gameState);
     }
 
+    @PostMapping("/beginGame")
     @Override
-    public GameStateDto beginGame(String gameSessionId, String playerName, GameEdition gameEdition) {
-        validateGameSessionId(gameSessionId);
-        validatePlayerName(playerName);
+    public GameStateDto beginGame(@RequestBody BeginGameDto beginGameDto) {
+        validateGameSessionId(beginGameDto.getGameSessionId());
+        validatePlayerName(beginGameDto.getPlayerName());
 
-        GameState gameState = gameStatePersistence.loadGameState(gameSessionId);
+        GameState gameState = gameStatePersistence.loadGameState(beginGameDto.getGameSessionId());
         validateGameState(gameState);
 
         if (gameState.getPlayersList().getPlayers().size() > 1) {
-            GameInitializer.initGameDeck(gameEdition, gameState, playerName);
+            GameInitializer.initGameDeck(beginGameDto.getGameEdition(), gameState, beginGameDto.getPlayerName());
         } else {
             throw new IllegalStateException("Not enough players to start the game");
         }
@@ -75,29 +75,32 @@ public class GameController implements GameControllerApi {
         return buildGameStateDto(gameState);
     }
 
+    @GetMapping("/getUpdatedInfo/{gameSessionId}")
     @Override
-    public GameStateDto getUpdatedInfo(String gameSessionId) {
+    public GameStateDto getUpdatedInfo(@PathVariable("gameSessionId") String gameSessionId) {
         validateGameSessionId(gameSessionId);
         GameState gameState = gameStatePersistence.loadGameState(gameSessionId);
         return buildGameStateDto(gameState);
     }
 
+    @PostMapping("/makeMove")
     @Override
-    public GameStateDto makeMove(String gameSessionId, String playerName, MoveType type, Card card, String targetPlayerName) {
-        validateGameSessionId(gameSessionId);
-        validatePlayerName(playerName);
-        GameState gameState = gameStatePersistence.loadGameState(gameSessionId);
+    public GameStateDto makeMove(@RequestBody MakeMoveDto makeMoveDto) {
+        validateGameSessionId(makeMoveDto.getGameSessionId());
+        validatePlayerName(makeMoveDto.getPlayerName());
+        GameState gameState = gameStatePersistence.loadGameState(makeMoveDto.getGameSessionId());
         moveProcessor.process(ProcessCardModel.builder()
                 .gameState(gameState)
-                .activePlayer(gameState.getPlayersList().getPlayerByName(playerName))
-                .currentCard(card)
-                .targetPlayerNam(targetPlayerName)
-                .moveType(type)
+                .activePlayer(gameState.getPlayersList().getPlayerByName(makeMoveDto.getPlayerName()))
+                .currentCard(makeMoveDto.getCard())
+                .targetPlayerNam(makeMoveDto.getTargetPlayerName())
+                .moveType(makeMoveDto.getType())
                 .build());
         gameStatePersistence.saveGameState(gameState);
         return buildGameStateDto(gameState);
     }
 
+    @GetMapping("/getGameEditions")
     @Override
     public List<GameEdition> getGameEditions() {
         return List.of(GameEdition.values());
