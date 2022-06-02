@@ -9,6 +9,8 @@ import ua.kostenko.expkitten.explodingkitten.api.dto.GameStateDto;
 import ua.kostenko.expkitten.explodingkitten.api.dto.PlayerInfoDto;
 import ua.kostenko.expkitten.explodingkitten.engine.GameInitializer;
 import ua.kostenko.expkitten.explodingkitten.engine.PlayersList;
+import ua.kostenko.expkitten.explodingkitten.engine.processors.ProcessCardModel;
+import ua.kostenko.expkitten.explodingkitten.engine.processors.Processor;
 import ua.kostenko.expkitten.explodingkitten.models.GameDirection;
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
 import ua.kostenko.expkitten.explodingkitten.models.Player;
@@ -22,11 +24,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GameController implements GameControllerApi {
     private final GameStatePersistence gameStatePersistence;
+    private final Processor moveProcessor;
 
     @Override
     public GameStateDto startGameSession(int numberOfPlayers, GameEdition gameEdition) {
         GameState gameState = new GameState(UUID.randomUUID().toString(),
                 new PlayersList(),
+                new LinkedList<>(),
                 new LinkedList<>(),
                 new LinkedList<>(),
                 GameDirection.FORWARD);
@@ -82,8 +86,16 @@ public class GameController implements GameControllerApi {
     public GameStateDto makeMove(String gameSessionId, String playerName, MoveType type, Card card, String targetPlayerName) {
         validateGameSessionId(gameSessionId);
         validatePlayerName(playerName);
-
-        return null;
+        GameState gameState = gameStatePersistence.loadGameState(gameSessionId);
+        moveProcessor.process(ProcessCardModel.builder()
+                .gameState(gameState)
+                .activePlayer(gameState.getPlayersList().getPlayerByName(playerName))
+                .currentCard(card)
+                .targetPlayerNam(targetPlayerName)
+                .moveType(type)
+                .build());
+        gameStatePersistence.saveGameState(gameState);
+        return buildGameStateDto(gameState);
     }
 
     @Override

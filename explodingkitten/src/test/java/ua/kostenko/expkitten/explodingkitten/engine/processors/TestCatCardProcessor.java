@@ -1,14 +1,12 @@
 package ua.kostenko.expkitten.explodingkitten.engine.processors;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class TestCatCardProcessor {
     //    private GameDirector gd;
     private ProcessCardModel processCardModel;
 
-    @BeforeEach
+//    @BeforeEach
 //    public void setup() {
 //        gd = new GameDirector(GameEdition.ORIGINAL_EDITION, 4);
 //
@@ -72,7 +70,7 @@ public class TestCatCardProcessor {
 //        assertTrue(secondCatForPlayer2NextPlayer.get().isActive());
 //    }
 
-    @Test
+    //    @Test
     public void testProcessValidationException() {
         CatCardProcessor processor = new CatCardProcessor();
 

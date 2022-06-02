@@ -17,7 +17,7 @@ public class GameInitializer {
     }
 
     public static void initGameDeck(GameEdition gameEdition, GameState gameState, String playerName) {
-        if (Objects.isNull(gameEdition) && Objects.isNull(gameState)) {
+        if (Objects.isNull(gameEdition) || Objects.isNull(gameState)) {
             throw new NullPointerException("GameEdition or GameState is NULL");
         }
         if (Objects.isNull(playerName) || playerName.isBlank()) {

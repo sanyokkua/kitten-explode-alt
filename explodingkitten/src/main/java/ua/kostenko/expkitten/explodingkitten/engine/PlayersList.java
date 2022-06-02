@@ -24,6 +24,16 @@ public class PlayersList implements Iterable<Player> {
         return new ArrayList<>(players.values());
     }
 
+    public Player getPlayerByName(String playerName) {
+        Optional<Player> playerOptional = players.values().stream()
+                .filter(player -> playerName.equals(player.getPlayerName()))
+                .findAny();
+        if (playerOptional.isEmpty()) {
+            throw new IllegalArgumentException("Player doesn't exist");
+        }
+        return playerOptional.get();
+    }
+
     public Player getNext(Player currentPlayer) {
         Optional<Map.Entry<Integer, Player>> currentPlayerEntry = getCurrentPlayerEntry(currentPlayer);
         if (currentPlayerEntry.isEmpty()) {

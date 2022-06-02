@@ -10,7 +10,7 @@ import java.util.Spliterator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestPlayerList {
+public class PlayerListTest {
 
     @Test
     public void testCreationOfList() {
@@ -128,6 +128,26 @@ public class TestPlayerList {
         Spliterator<Player> spliterator = list.spliterator();
 
         assertNotNull(spliterator);
+    }
+
+    @Test
+    public void testGetPlayerByName() {
+        PlayersList list = new PlayersList();
+        Player player1 = Player.builder().playerName("player1").build();
+        Player player2 = Player.builder().playerName("player2").build();
+        Player player3 = Player.builder().playerName("player3").build();
+
+        list.addPlayer(player1);
+        list.addPlayer(player2);
+        list.addPlayer(player3);
+
+        Player actualPl1 = list.getPlayerByName("player1");
+        Player actualPl2 = list.getPlayerByName("player2");
+        Player actualPl3 = list.getPlayerByName("player3");
+
+        assertEquals(player1, actualPl1);
+        assertEquals(player2, actualPl2);
+        assertEquals(player3, actualPl3);
     }
 
     @Test

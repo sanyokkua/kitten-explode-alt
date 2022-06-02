@@ -12,7 +12,6 @@ import static ua.kostenko.expkitten.explodingkitten.models.card.CardAction.*;
 public class DeckGenerator {
 
     private DeckGenerator() {
-
     }
 
     public static Map<CardAction, Integer> getDeckInformationForEdition(GameEdition gameEdition) {
