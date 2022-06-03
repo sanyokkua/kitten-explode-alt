@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.api;
+package ua.kostenko.expkitten.explodingkitten.engine;
 
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
 

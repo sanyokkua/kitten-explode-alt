@@ -3,16 +3,15 @@ package ua.kostenko.expkitten.explodingkitten.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ua.kostenko.expkitten.explodingkitten.api.GameControllerApi;
-import ua.kostenko.expkitten.explodingkitten.api.GameStatePersistence;
-import ua.kostenko.expkitten.explodingkitten.api.MoveType;
 import ua.kostenko.expkitten.explodingkitten.api.dto.request.AddPlayerToSessionDto;
 import ua.kostenko.expkitten.explodingkitten.api.dto.request.BeginGameDto;
 import ua.kostenko.expkitten.explodingkitten.api.dto.request.GetInfoForPlayer;
 import ua.kostenko.expkitten.explodingkitten.api.dto.request.MakeMoveDto;
 import ua.kostenko.expkitten.explodingkitten.api.dto.response.CommonPlayerInfoDto;
 import ua.kostenko.expkitten.explodingkitten.api.dto.response.GameStateDto;
-import ua.kostenko.expkitten.explodingkitten.api.dto.response.GameStateWithPlayerIdDto;
 import ua.kostenko.expkitten.explodingkitten.api.dto.response.PlayerFullInfoDto;
+import ua.kostenko.expkitten.explodingkitten.engine.GameStatePersistence;
+import ua.kostenko.expkitten.explodingkitten.engine.MoveType;
 import ua.kostenko.expkitten.explodingkitten.engine.processors.ProcessCardModel;
 import ua.kostenko.expkitten.explodingkitten.engine.processors.Processor;
 import ua.kostenko.expkitten.explodingkitten.engine.tools.GameInitializer;
@@ -41,12 +40,12 @@ public class GameController implements GameControllerApi {
                 new LinkedList<>(),
                 GameDirection.FORWARD);
         gameStatePersistence.saveGameState(gameState);
-        return buildGameStateDto(gameState);
+        return buildGameStateDto(gameState, null);
     }
 
     @PostMapping("/addUserToSession")
     @Override
-    public GameStateWithPlayerIdDto addPlayerToSession(@RequestBody AddPlayerToSessionDto addPlayerToSessionDto) {
+    public GameStateDto addPlayerToSession(@RequestBody AddPlayerToSessionDto addPlayerToSessionDto) {
         validateGameSessionId(addPlayerToSessionDto.getGameSessionId());
         validatePlayerNameOrId(addPlayerToSessionDto.getPlayerName());
 
@@ -63,7 +62,7 @@ public class GameController implements GameControllerApi {
                 .playerId(playerId)
                 .build());
         gameStatePersistence.saveGameState(gameState);
-        return buildGameStateWithPlayerIdDto(gameState, playerId);
+        return buildGameStateDto(gameState, playerId);
     }
 
     @PostMapping("/beginGame")
@@ -82,7 +81,7 @@ public class GameController implements GameControllerApi {
         }
 
         gameStatePersistence.saveGameState(gameState);
-        return buildGameStateDto(gameState);
+        return buildGameStateDto(gameState, null);
     }
 
     @GetMapping("/getUpdatedInfo/{gameSessionId}")
@@ -90,7 +89,7 @@ public class GameController implements GameControllerApi {
     public GameStateDto getUpdatedInfo(@PathVariable("gameSessionId") String gameSessionId) {
         validateGameSessionId(gameSessionId);
         GameState gameState = gameStatePersistence.loadGameState(gameSessionId);
-        return buildGameStateDto(gameState);
+        return buildGameStateDto(gameState, null);
     }
 
     @PostMapping("/makeMove")
@@ -107,7 +106,7 @@ public class GameController implements GameControllerApi {
                 .moveType(makeMoveDto.getType())
                 .build());
         gameStatePersistence.saveGameState(gameState);
-        return buildGameStateDto(gameState);
+        return buildGameStateDto(gameState, null);
     }
 
     @PostMapping("/getInfoForPlayer")
@@ -133,23 +132,8 @@ public class GameController implements GameControllerApi {
         return List.of(GameEdition.values());
     }
 
-    private GameStateDto buildGameStateDto(GameState gameState) {
+    private GameStateDto buildGameStateDto(GameState gameState, String playerId) {
         return GameStateDto.builder()
-                .gameSessionId(gameState.getGameSessionId())
-                .gameDirection(gameState.getGameDirection())
-                .amountOfCardsInDeck(gameState.getCardDeck().size())
-                .discardPile(gameState.getDiscardPile())
-                .players(gameState.getPlayersList().getPlayers().stream().map(player -> CommonPlayerInfoDto.builder()
-                        .amountOfCards(player.getPlayerCards().size())
-                        .isActive(player.isActive())
-                        .isAlive(player.isAlive())
-                        .playerName(player.getPlayerName())
-                        .build()).collect(Collectors.toList()))
-                .build();
-    }
-
-    private GameStateWithPlayerIdDto buildGameStateWithPlayerIdDto(GameState gameState, String playerId) {
-        return GameStateWithPlayerIdDto.builder()
                 .gameSessionId(gameState.getGameSessionId())
                 .gameDirection(gameState.getGameDirection())
                 .amountOfCardsInDeck(gameState.getCardDeck().size())

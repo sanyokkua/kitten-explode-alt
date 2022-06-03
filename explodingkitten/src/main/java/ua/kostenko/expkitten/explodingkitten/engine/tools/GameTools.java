@@ -1,6 +1,9 @@
 package ua.kostenko.expkitten.explodingkitten.engine.tools;
 
+import lombok.NonNull;
+import ua.kostenko.expkitten.explodingkitten.models.GameDirection;
 import ua.kostenko.expkitten.explodingkitten.models.GameState;
+import ua.kostenko.expkitten.explodingkitten.models.Player;
 import ua.kostenko.expkitten.explodingkitten.models.card.Card;
 import ua.kostenko.expkitten.explodingkitten.models.deck.GameEdition;
 
@@ -34,6 +37,35 @@ public class GameTools {
             gameState.getCardDeck().addLast(card);
         } else {
             gameState.getCardDeck().add(position, card);
+        }
+    }
+
+    public static void activateNextPlayer(@NonNull Player active, @NonNull GameState state) {
+        GameDirection gameDirection = state.getGameDirection();
+        PlayersList playersList = state.getPlayersList();
+        switch (gameDirection) {
+            case FORWARD: {
+                active.setActive(false);
+                Player nextPlayer = playersList.getNext(active);
+                if (nextPlayer.isAlive()) {
+                    nextPlayer.setActive(true);
+                } else {
+                    activateNextPlayer(nextPlayer, state);
+                }
+                break;
+            }
+            case BACKWARD: {
+                active.setActive(false);
+                Player nextPlayer = playersList.getPrevious(active);
+                if (nextPlayer.isAlive()) {
+                    nextPlayer.setActive(true);
+                } else {
+                    activateNextPlayer(nextPlayer, state);
+                }
+                break;
+            }
+            default:
+                throw new IllegalArgumentException();
         }
     }
 }

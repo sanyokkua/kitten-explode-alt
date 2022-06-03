@@ -165,4 +165,114 @@ public class GameToolsTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> GameTools.putCatCardIntoDeck(gameState, cat1, -1));
         Assertions.assertThrows(IllegalArgumentException.class, () -> GameTools.putCatCardIntoDeck(gameState, cat1, gameState.getCardDeck().size()));
     }
+
+    @Test
+    public void testNextPlayerForward() {
+        GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION, gameState, playerName1);
+        gameState.setGameDirection(GameDirection.FORWARD);
+
+        gameState.getPlayersList().getPlayers().forEach(p -> p.setActive(false));
+        Player player3 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName3.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        player3.setActive(true);
+
+        GameTools.activateNextPlayer(player3, gameState);
+
+        Player player4 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName4.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        assertFalse(player3.isActive());
+        assertTrue(player4.isActive());
+    }
+
+    @Test
+    public void testNextPlayerBackward() {
+        GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION, gameState, playerName1);
+        gameState.setGameDirection(GameDirection.BACKWARD);
+
+        gameState.getPlayersList().getPlayers().forEach(p -> p.setActive(false));
+        Player player3 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName3.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        player3.setActive(true);
+
+        GameTools.activateNextPlayer(player3, gameState);
+
+        Player player2 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName2.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        assertFalse(player3.isActive());
+        assertTrue(player2.isActive());
+    }
+
+    @Test
+    public void testNextPlayerForwardWithNotAlive() {
+        GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION, gameState, playerName1);
+        gameState.setGameDirection(GameDirection.FORWARD);
+
+        gameState.getPlayersList().getPlayers().forEach(p -> p.setAlive(false));
+        Player player1 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName1.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        Player player2 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName2.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        player1.setAlive(true);
+        player2.setAlive(true);
+
+        player2.setActive(true);
+
+        GameTools.activateNextPlayer(player2, gameState);
+
+        Player actualPl2 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName2.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        Player actualPl1 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName1.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        assertFalse(actualPl2.isActive());
+        assertTrue(actualPl1.isActive());
+    }
+
+    @Test
+    public void testNextPlayerBackwardWithNotAlive() {
+        GameInitializer.initGameDeck(GameEdition.ORIGINAL_EDITION, gameState, playerName1);
+        gameState.setGameDirection(GameDirection.BACKWARD);
+
+        gameState.getPlayersList().getPlayers().forEach(p -> p.setAlive(false));
+        Player player1 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName1.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        Player player2 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName2.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        player1.setAlive(true);
+        player2.setAlive(true);
+
+        player1.setActive(true);
+
+        GameTools.activateNextPlayer(player1, gameState);
+
+        Player actualPl2 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName2.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        Player actualPl1 = gameState.getPlayersList().getPlayers().stream()
+                .filter(p -> playerName1.equals(p.getPlayerName()))
+                .findFirst()
+                .get();
+        assertFalse(actualPl1.isActive());
+        assertTrue(actualPl2.isActive());
+    }
 }

@@ -10,9 +10,11 @@ import java.util.List;
 @Data
 @Builder
 public class GameStateDto {
-    protected final String gameSessionId;
-    protected final int amountOfCardsInDeck;
-    protected final GameDirection gameDirection;
-    protected final List<CommonPlayerInfoDto> players;
-    protected final List<Card> discardPile;
+    private final String gameSessionId;
+    private final String playerId;
+
+    private final int amountOfCardsInDeck;
+    private final GameDirection gameDirection;
+    private final List<CommonPlayerInfoDto> players;
+    private final List<Card> discardPile;
 }

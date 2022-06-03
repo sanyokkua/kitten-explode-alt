@@ -1,44 +1,33 @@
 package ua.kostenko.expkitten.explodingkitten.engine.processors;
 
-import ua.kostenko.expkitten.explodingkitten.engine.tools.PlayersList;
-import ua.kostenko.expkitten.explodingkitten.models.GameDirection;
-import ua.kostenko.expkitten.explodingkitten.models.GameState;
-import ua.kostenko.expkitten.explodingkitten.models.Player;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
+
+@Slf4j
 public abstract class AbstractCardProcessor implements Processor {
     protected Processor next;
 
     @Override
-    public void setNext(Processor processor) {
+    public void setNext(@NonNull Processor processor) {
         this.next = processor;
     }
 
-    public void activateNextPlayer(Player active, GameState state) {
-        GameDirection gameDirection = state.getGameDirection();
-        PlayersList playersList = state.getPlayersList();
-        switch (gameDirection) {
-            case FORWARD: {
-                active.setActive(false);
-                Player nextPlayer = playersList.getNext(active);
-                if (nextPlayer.isAlive()) {
-                    nextPlayer.setActive(true);
-                } else {
-                    activateNextPlayer(nextPlayer, state);
-                }
-                break;
-            }
-            case BACKWARD: {
-                active.setActive(false);
-                Player nextPlayer = playersList.getPrevious(active);
-                if (nextPlayer.isAlive()) {
-                    nextPlayer.setActive(true);
-                } else {
-                    activateNextPlayer(nextPlayer, state);
-                }
-                break;
-            }
-            default:
-                throw new IllegalArgumentException();
+    @Override
+    public void process(ProcessCardModel processCardModel) {
+        if (Objects.isNull(processCardModel)) {
+            throw new IllegalArgumentException("ProcessCardModel can't be null");
         }
+        log.debug("ProcessCardModel: {}", processCardModel);
+        log.debug("CurrentProcessorIs: {}", this.getClass().getSimpleName());
+        if (Objects.isNull(processCardModel.getMoveType())
+                && Objects.isNull(processCardModel.getActivePlayer())
+                && Objects.isNull(processCardModel.getGameState())) {
+            throw new IllegalArgumentException("MoveType/ActivePlayer/GameState shouldn't be null");
+        }
+        processCardModel(processCardModel);
     }
+
+    protected abstract void processCardModel(ProcessCardModel processCardModel);
 }

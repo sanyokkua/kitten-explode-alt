@@ -1,4 +1,4 @@
-package ua.kostenko.expkitten.explodingkitten.api;
+package ua.kostenko.expkitten.explodingkitten.engine;
 
 public enum MoveType {
     TAKE_CARD,

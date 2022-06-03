@@ -2,7 +2,7 @@ package ua.kostenko.expkitten.explodingkitten.api.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
-import ua.kostenko.expkitten.explodingkitten.api.MoveType;
+import ua.kostenko.expkitten.explodingkitten.engine.MoveType;
 import ua.kostenko.expkitten.explodingkitten.models.card.Card;
 
 import java.util.List;
